@@ -52,6 +52,16 @@ class ArrayData implements DataInterface
     }
 
     /**
+     * Retrieve the keys
+     *
+     * @return array
+     */
+    public function getKeys()
+    {
+        return $this->keys;
+    }
+
+    /**
      * Gets the depth of the information in this DataInterface
      *
      * @return integer
