@@ -105,5 +105,4 @@ class CSVExporter extends AbstractExporter
 
         return $keys;
     }
-
 }
