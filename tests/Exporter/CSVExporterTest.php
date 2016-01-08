@@ -5,6 +5,7 @@ namespace RonRademaker\Exporter\Exporter\Test;
 use PHPUnit_Framework_TestCase;
 use RonRademaker\Exporter\Data\ArrayData;
 use RonRademaker\Exporter\Data\DataInterface;
+use RonRademaker\Exporter\Exception\UnsupportedDataException;
 use RonRademaker\Exporter\Exporter\CSVExporter;
 use RonRademaker\Exporter\Option\FileOption;
 use RonRademaker\Exporter\Option\HeadersOption;
@@ -38,6 +39,69 @@ class CSVExporterTest extends PHPUnit_Framework_TestCase
 
             unlink($file);
         }
+    }
+
+    /**
+     * Test if unsupported data structures cause an exception
+     */
+    public function testUnsupportedDataStructureThrowsException()
+    {
+        $this->setExpectedException(UnsupportedDataException::class);
+
+        $input = new ArrayData(
+            [
+                [
+                    ['hello world']
+                ]
+            ]
+        );
+
+        $exporter = new CSVExporter();
+        $exporter->setInput($input);
+        $exporter->export();
+    }
+
+    /**
+     * Tests setting the option for output
+     *
+     * @dataProvider provideOptionTestData
+     */
+    public function testSettingTheOption(FileOption $option, $overwrite)
+    {
+        $data = [
+            ['foo' => 'foo', 'bar' => 'foobar'],
+            ['foo' => 'bar', 'bar' => 'foo'],
+            ['bar' => 'bar','foo' => 'foo', 'baz' => 'foobar']
+        ];
+
+        $input = new ArrayData($data);
+        $exporter = new CSVExporter([new FileOption('foo.bar')]);
+        $exporter->setInput($input);
+        $exporter->setOption($option, $overwrite);
+        $exporter->export();
+
+        $this->assertEquals("foo,bar,baz\nfoo,foobar,\nbar,foo,\nfoo,bar,foobar\n", file_get_contents($option->getValue()));
+        if ($overwrite === true) {
+            $this->assertFileNotExists('foo.bar');
+        } else {
+            $this->assertEquals("foo,bar,baz\nfoo,foobar,\nbar,foo,\nfoo,bar,foobar\n", file_get_contents('foo.bar'));
+            unlink('foo.bar');
+        }
+
+        unlink($option->getValue());
+    }
+
+    /**
+     * Provide test data for setting the FileOption
+     *
+     * @return array
+     */
+    public function provideOptionTestData()
+    {
+        return [
+            [new FileOption('foo.csv'), false],
+            [new FileOption('foo.csv'), true]
+        ];
     }
 
     /**
