@@ -51,8 +51,10 @@ abstract class AbstractExporter implements ExporterInterface
                     $this->options[$index] = $option;
                     return;
                 }
+                // @codeCoverageIgnoreStart
             }
         }
+        // @codeCoverageIgnoreEnd
 
         $this->options[] = $option;
     }

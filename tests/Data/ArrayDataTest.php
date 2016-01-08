@@ -57,6 +57,18 @@ class ArrayDataTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test getting the keys of an array
+     */
+    public function testGetKeys()
+    {
+        $array = ['foo'=>'hello','bar'=>'world'];
+
+        $data = new ArrayData($array);
+
+        $this->assertEquals(['foo', 'bar'], $data->getKeys());
+    }
+
+    /**
      * Gets some array to test the Iterator with
      *
      * @return array
